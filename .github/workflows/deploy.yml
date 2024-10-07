@@ -1,24 +1,21 @@
 name: Deployment Workflow
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build Workflow"]
+    types:
+      - completed
     branches:
       - main
 
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
-   
-permissions:
-  contents: read
-  pull-requests: read
-
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: npm install
